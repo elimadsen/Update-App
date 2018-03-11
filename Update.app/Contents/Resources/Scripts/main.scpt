@@ -1,9 +1,17 @@
-set updateLocation to "/Applications" -- set to "ask" to display dialog asking for location. Set to location where updated app is located to skip dialog. Will stil ask for location if given location is invalid.
+set updateLocation to "ask" -- set to "ask" to display dialog asking for location. Set to location where updated app is located to skip dialog. Will stil ask for location if given location is invalid.
 
-set oldScriptPath to ((path to me as text) as alias) as string
-set oldScriptPOSIX to POSIX path of oldScriptPath
-tell application "System Events" to set oldDate to modification date of file oldScriptPOSIX
+set updateScriptPath to ((path to me as text) as alias) as string
+set updateScriptPOSIX to POSIX path of updateScriptPath
+tell application "System Events" to set oldDate to modification date of file updateScriptPOSIX
+tell application "Finder" to get (container of(container of(container of(container of (path to me))))) as text
+set appPath to POSIX path of result
+set TMPupdateLocation to "tmp"
 
+(*set oldDelims to AppleScript's text item delimiters
+set AppleScript's text item delimiters to {"/"}
+set appName to last item of appPath
+set AppleScript's text item delimiters to oldDelims
+log appName*)
 
 if updateLocation is not "ask" then
 	tell application "System Events"
@@ -13,6 +21,7 @@ if updateLocation is not "ask" then
 			display dialog updateLocation & " is not a valid location" with title "Invalid location" buttons {"Enter new location", "Skip update"} default button "Skip update"
 			set buttonPressed to button returned of result
 			if buttonPressed is "Enter new location" then
+				set TMPupdateLocation to updateLocation
 				set updateLocation to "ask"
 			else if buttonPressed is "Skip update" then
 				display dialog "Skipping update..." with title "Skipping update" buttons ("Okay") default button "Okay" giving up after 1
@@ -24,7 +33,11 @@ if updateLocation is not "ask" then
 end if
 if updateLocation is "ask" then
 	set x to 1
-	set updateLocation to ""
+	if TMPupdateLocation is not "tmp"
+		set updateLocation to TMPupdateLocation
+	else
+		set updateLocation to ""
+	end if
 	repeat while x = 1
 		set userInput to (display dialog "Enter location to check for updates" with title "Update Location" default answer updateLocation buttons {"Quit", "Skip", "Check for updates"} default button "Check for updates")
 		set updateLocation to the text returned of userInput
@@ -52,4 +65,4 @@ if updateLocation is "ask" then
 	end repeat
 end if
 
-log oldDate
+log appPath
