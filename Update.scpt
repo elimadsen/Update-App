@@ -1,4 +1,4 @@
-set updateLocation to "/Applications" -- set to "ask" to display dialog asking for location. Set to location where updated app is located to skip dialog.
+set updateLocation to "ask" -- set to "ask" to display dialog asking for location. Set to location where updated app is located to skip dialog.
 
 set oldSctiptPath to path to me
 set appName to name of me
@@ -8,7 +8,7 @@ set mountedVolumes to list disks
 if updateLocation is not "ask" then
   tell application "System Events"
     if exists folder updateLocation then
-      display dialog "Checking for updates in "& updateLocation buttons ("Okay") default button "Okay" giving up after 2
+      display dialog "Checking for updates in " & updateLocation buttons ("Okay") default button "Okay" giving up after 2
     else
       display dialog updateLocation & " is not a valid location" buttons ("Enter new location","Skip update") default button "Skip update" giving up after 10
       set updateLocation to "ask"
@@ -31,7 +31,7 @@ if updateLocation is "ask" then
       set x to 2
       delay .5
     else if updateLocation is "" then
-      display dialog "Please eneter a valid path. ex: /Applications/" buttons ("Okay") default button "Okay" giving up after 10
+      display dialog "\"\" is not a valid location" buttons ("Okay") default button "Okay" giving up after 10
       delay .5
     else if updateLocation is not "" then
       tell application "System Events"
@@ -39,7 +39,7 @@ if updateLocation is "ask" then
           display dialog "Checking for updates in "& updateLocation buttons ("Okay") default button "Okay" giving up after 2
           set x to 2
         else
-          display dialog "Please eneter a valid path. ex: /Applications/" buttons ("Okay") default button "Okay" giving up after 10
+          display dialog updateLocation & " is not a valid location" buttons ("Okay") default button "Okay" giving up after 10
         end if
       end tell
       delay .5
