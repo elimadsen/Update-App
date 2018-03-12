@@ -1,10 +1,11 @@
 --------------------------------------------------------------------------------
----------- Options start here
+---------- Options
 --------------------------------------------------------------------------------
-set displayDiags to "yes" -- set to "yes" to display all dialogs or to "no" to display as little dialogs as possible
+set updateLocation to "/Applications/" -- set to "ask" to display dialog asking for location. Set to location where updated app is located to skip dialog. Will stil ask for location if given location is invalid.
+set displayDiags to "yes" -- set to "yes" to display all dialogs or to "no" to display as little dialogs as possible and auto-update
 
 --------------------------------------------------------------------------------
----------- Variables start here
+---------- Variables
 --------------------------------------------------------------------------------
 global appName
 
@@ -20,21 +21,27 @@ set appPath to result
 set appPOSIX to POSIX path of appPath
 set appName to the last text item of appPOSIX
 
-set TMPupdateLocation to "tmp"
+set tmpUpdateLocation to "tmp"
 
 --------------------------------------------------------------------------------
----------- Handlers start here
+---------- Handlers
 --------------------------------------------------------------------------------
 on fileExists(givenLocation) -- searches in givenLocation for an app with the same name of this app
 	set lastChar to last character of givenLocation as text
+
 	if lastChar is not "/" then
 		set TMPLocation to givenLocation & "/"
 	else
 		set TMPLocation to givenLocation
 	end if
-	set pathTMP to TMPLocation & appName
 
--- TODO add if statement to only add file name if it is not already present
+	set tmpLocationMinus to (text 1 through ((length of TMPLocation) - 1) of TMPLocation) as string
+
+	if last text item of tmpLocationMinus is not appName then
+		set pathTMP to tmpLocationMinus & "/" & appName
+	else if last text item of tmpLocationMinus is appName then
+		set pathTMP to tmpLocationMinus & "/"
+	end if
 
 	tell application "System Events"
 		if exists file pathTMP then
@@ -43,23 +50,23 @@ on fileExists(givenLocation) -- searches in givenLocation for an app with the sa
 			return False
 		end if
 	end tell
+	beep
 end fileExists
 
+--------------------------------------------------------------------------------
 -- TODO create a disply dialog handler (have option to skip as many diaglogs as possible)
 
 --------------------------------------------------------------------------------
----------- Script starts here
+---------- Script
 --------------------------------------------------------------------------------
-fileExists(updateLocation)
-
 if updateLocation is not "ask" then
 		if fileExists(updateLocation) = True then
-			display dialog "Checking for updates in " & updateLocation with title "Checking for updates" buttons ("Okay") default button "Okay" giving up after 2
+			display dialog "Checking for updates in " & updateLocation with title "Found " & appName & "!" buttons ("Okay") default button "Okay" giving up after 2
 		else
 			display dialog updateLocation & " is not a valid location" with title "Invalid location" buttons {"Enter new location", "Skip update"} default button "Skip update"
 			set buttonPressed to button returned of result
 			if buttonPressed is "Enter new location" then
-				set TMPupdateLocation to updateLocation
+				set tmpUpdateLocation to updateLocation
 				set updateLocation to "ask"
 			else if buttonPressed is "Skip update" then
 				display dialog "Skipping update..." with title "Skipping update" buttons ("Okay") default button "Okay" giving up after 1
@@ -71,7 +78,7 @@ end if
 
 if updateLocation is "ask" then
 	set x to 1
-	if TMPupdateLocation is not "tmp" then
+	if tmpUpdateLocation is not "tmp" then
 		set updateLocation to TMPupdateLocation
 	else
 		set updateLocation to ""
@@ -91,18 +98,16 @@ if updateLocation is "ask" then
 		else if updateLocation is "" then
 			display dialog "\"\" is not a valid location" with title "Invalid location" buttons ("Okay") default button "Okay" giving up after 10
 		else if updateLocation is not "" then
-			tell application "System Events"
-				if exists folder updateLocation then
-					display dialog "Checking for updates in " & updateLocation with title "Checking for updates" buttons ("Okay") default button "Okay" giving up after 2
+				if fileExists(updateLocation) = True then
+					display dialog "Checking for updates in " & updateLocation with title "Found " & appName & "!" buttons ("Okay") default button "Okay" giving up after 2
 					set x to 2
 				else
 					display dialog updateLocation & " is not a valid location" with title "Invalid location" buttons ("Okay") default button "Okay" giving up after 10
 				end if
-			end tell
 		end if
 	end repeat
 end if
 
--- TODO have the update show a progres bar "updaing ## files"
+-- IDEA have the update show a progres bar "updaing ## files"
 
 set AppleScript's text item delimiters to oldDelims
