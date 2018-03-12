@@ -1,7 +1,6 @@
 --------------------------------------------------------------------------------
 ---------- Options start here
 --------------------------------------------------------------------------------
-set updateLocation to "/Applicationsx/" -- set to "ask" to display dialog asking for location. Set to location where updated app is located to skip dialog. Will stil ask for location if given location is invalid.
 set displayDiags to "yes" -- set to "yes" to display all dialogs or to "no" to display as little dialogs as possible
 
 --------------------------------------------------------------------------------
@@ -26,7 +25,7 @@ set TMPupdateLocation to "tmp"
 --------------------------------------------------------------------------------
 ---------- Handlers start here
 --------------------------------------------------------------------------------
-on fileExists(givenLocation) -- searches in givenLocation for an app with the same name from this app
+on fileExists(givenLocation) -- searches in givenLocation for an app with the same name of this app
 	set lastChar to last character of givenLocation as text
 	if lastChar is not "/" then
 		set TMPLocation to givenLocation & "/"
@@ -34,6 +33,8 @@ on fileExists(givenLocation) -- searches in givenLocation for an app with the sa
 		set TMPLocation to givenLocation
 	end if
 	set pathTMP to TMPLocation & appName
+
+-- TODO add if statement to only add file name if it is not already present
 
 	tell application "System Events"
 		if exists file pathTMP then
