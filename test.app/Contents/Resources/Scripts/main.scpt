@@ -50,11 +50,10 @@ on fileExists(givenLocation) -- searches in givenLocation for an app with the sa
 			return False
 		end if
 	end tell
-	beep
 end fileExists
 
 --------------------------------------------------------------------------------
--- TODO create a disply dialog handler (have option to skip as many diaglogs as possible)
+-- TODO create a disply dialog handler (use option to skip as many diaglogs as possible)
 
 --------------------------------------------------------------------------------
 ---------- Script
