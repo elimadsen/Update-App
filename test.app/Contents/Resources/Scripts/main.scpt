@@ -44,6 +44,8 @@ on fileExists(givenLocation) -- searches in givenLocation for an app with the sa
 	end tell
 end fileExists
 
+-- TODO create a disply dialog handler (have option to skip as many diaglogs as possible)
+
 --------------------------------------------------------------------------------
 ---------- Script starts here
 --------------------------------------------------------------------------------
@@ -64,7 +66,6 @@ if updateLocation is not "ask" then
 				set updateLocation to "skip"
 			end if
 		end if
-	--end tell
 end if
 
 if updateLocation is "ask" then
@@ -79,7 +80,7 @@ if updateLocation is "ask" then
 		set updateLocation to the text returned of userInput
 		set buttonPressed to button returned of userInput
 		if buttonPressed is "Quit" then
-			--display dialog "Quitting..." with title "Quitting" buttons ("Okay") default button "Okay" giving up after 1
+			display dialog "Quitting..." with title "Quitting" buttons ("Okay") default button "Okay" giving up after 1
 			set x to 2
 			quit
 		else if buttonPressed is "Skip" then
@@ -101,9 +102,6 @@ if updateLocation is "ask" then
 	end repeat
 end if
 
-(*if updateLocation is "skip"
-else if updateLocation is ""*)
+-- TODO have the update show a progres bar "updaing ## files"
 
---have the update show a progres bar "updaing ## files"
-
---set AppleScript's text item delimiters to oldDelims
+set AppleScript's text item delimiters to oldDelims
