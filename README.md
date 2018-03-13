@@ -1,5 +1,7 @@
 # Update-App
 
+(in progress)
+
 An app that updates itself. Written with applescript.
 
 The main goal of this applescript application is to give myself applescript experience. What I want it to do is run a script on startup that will check a networked location with the most updated version of the app to see if it has any changes. If it does, then it will run code that updates the rest of the app. If not then it will just continue with the main application.
