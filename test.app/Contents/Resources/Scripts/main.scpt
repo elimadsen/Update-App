@@ -33,12 +33,12 @@ set tmpUpdateLocation to "tmp"
 on fileExists() -- searches in givenLocation for an app with the same name of this app
 	set lastCharOne to last character of updateLocation
 	if lastCharOne is "/" then
-		set tmpMinusSlash to (text 1 through (length of (updateLocation as text) - 1) of updateLocation) as string
+		set tmpMinusSlash to (text 1 through ((length of (updateLocation as text)) - 1) of updateLocation) as string
 	else
 		set tmpMinusSlash to updateLocation
 	end if
 	if last text item of tmpMinusSlash is appName then
-		set tmpMinusApp to (text 1 through (length of (tmpMinusSlash as text) - (length of (appName as text))) of tmpMinusSlash) as string
+		set tmpMinusApp to (text 1 through ((length of (tmpMinusSlash as text)) - (length of (appName as text))) of tmpMinusSlash) as string
 		set tmpPath to tmpMinusSlash
 	else
 		set tmpMinusApp to tmpMinusSlash & "/"
@@ -55,23 +55,49 @@ on fileExists() -- searches in givenLocation for an app with the same name of th
 end fileExists
 
 --------------------------------------------------------------------------------
-on dispDiag(typeMessage)
+on dispDiag(typeMessage) -- displays dialog for given message and sets variables accordingly
 	if typeMessage is "File Found" then
+		set x to 2
 		if displayDiags is "yes" then
-			display dialog "Check for updates in file " & tmpPath & "?" with title "Found " & appName & "!" buttons ("No, Skip update","No, enter new location","Yes") default button "Yes" giving up after 30
+			display dialog "Check for updates in file " & tmpPath & "?" with title "Found " & appName & "!" buttons {"Skip update", "Enter new location", "Yes"} default button "Yes" giving up after 15
 		else if displayDiags is "no" then
 			return "Yes"
 		end if
 
-	else if typeMessage is "Invalid Location" then
-		display dialog appName & " was not found in " & tmpMinusApp with title "Invalid Location" buttons ("Skip update", "Enter new location") default button "Enter new location" giving up after 30
+	else if typeMessage is "Invalid Location 1" then
+		display dialog appName & " was not found in " & tmpMinusApp with title "Invalid Location" buttons {"Skip update", "Enter new location"} default button "Enter new location" giving up after 60
+		set buttonPressed to button returned of result
+		if buttonPressed is "Enter new location" then
+			set tmpUpdateLocation to updateLocation
+			set updateLocation to "ask"
+		else if buttonPressed is "Skip update" then
+			dispDiag("Skip Update")
+		end if
+
+	else if typeMessage is "Invalid Location 2" then
+		display dialog appName & " was not found in " & tmpMinusApp with title "Invalid Location" buttons {"Skip update", "Enter new location"} default button "Enter new location" giving up after 60
+		set buttonPressed to button returned of result
+		if buttonPressed is "Enter new location" then
+		else if buttonPressed is "Skip" then
+			dispDiag("Skip Update")
+		end if
 
 	else if typeMessage is "Skip Update" then
-		if displaydiags is "yes" then
-			display dialog "Skipping " & appName & " Update" with title "Skipping Update" buttons ("Okay") default button "Okay" giving up after 10
+		if displayDiags is "yes" then
+			display dialog "Skipping " & appName & " Update" with title "Skipping Update" buttons ("Okay") default button "Okay" giving up after 5
 		end if
 		set updateLocation to "skip"
 		set x to 2
+
+	else if typeMessage is "Prompt Location" then
+		display dialog "Enter location to check for updates" with title "Update Location" default answer updateLocation buttons {"Quit", "Skip update", "Check for updates"} default button "Check for updates"
+
+	else if typeMessage is "Quit" then
+		if displayDiags is "yes" then
+			display dialog "Quitting..." with title "Quitting" buttons ("Okay") default button "Okay"
+		end if
+		set x to 2
+		quit
 	end if
 end dispDiag
 
@@ -82,14 +108,7 @@ if updateLocation is not "ask" then
 	if fileExists() is true then
 		dispDiag("File Found")
 	else
-		dispDiag("Invalid Location")
-		set buttonPressed to button returned of result
-		if buttonPressed is "Enter new location" then
-			set tmpUpdateLocation to updateLocation
-			set updateLocation to "ask"
-		else if buttonPressed is "Skip update" then
-			dispDiag("Skip Update")
-		end if
+		dispDiag("Invalid Location 1")
 	end if
 end if
 
@@ -101,27 +120,31 @@ if updateLocation is "ask" then
 		set updateLocation to ""
 	end if
 	repeat while x = 1
-		(*set userInput to (display dialog "Enter location to check for updates" with title "Update Location" default answer updateLocation buttons {"Quit", "Skip", "Check for updates"} default button "Check for updates")
+		set userInput to (dispDiag("Prompt Location"))
 		set updateLocation to the text returned of userInput
 		set buttonPressed to button returned of userInput
 		if buttonPressed is "Quit" then
-			display dialog "Quitting..." with title "Quitting" buttons ("Okay") default button "Okay" giving up after 1
-			set x to 2
-			quit
+			dispDiag("Quit")
 		else if buttonPressed is "Skip" then
-			display dialog "Skipping update..." with title "Skipping updates" buttons ("Okay") default button "Okay" giving up after 1
-			set x to 2
-			set updateLocation to "skip"
-		else if updateLocation is "" then
-			display dialog "\"\" is not a valid location" with title "Invalid location" buttons ("Okay") default button "Okay" giving up after 10
+			dispDiag("Skip Update")
+		else if buttonPressed is "Check for updates" then
+			if fileExists(updateLocation) = True then
+				dispDiag("Found File")
+			else
+				dispDiag("Invalid location 2")
+			end if
+		end if
+
+		if updateLocation is "" then
+			dispDiag("Invalid location 2")
+
 		else if updateLocation is not "" then
 			if fileExists(updateLocation) = true then
-				display dialog "Checking for updates in " & updateLocation with title "Found " & appName & "!" buttons ("Okay") default button "Okay" giving up after 2
-				set x to 2
+				dispDiag("File Found")
 			else
-				display dialog updateLocation & " is not a valid location" with title "Invalid location" buttons ("Okay") default button "Okay" giving up after 10
+				dispDiag("Invalid Location 2")
 			end if
-		end if*)
+		end if
 	end repeat
 end if
 
