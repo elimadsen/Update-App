@@ -1,9 +1,11 @@
 --------------------------------------------------------------------------------
----------- Variables
+---------- Global Variables
 --------------------------------------------------------------------------------
 global appName
 global appPath
 global folderPath
+global currentVersion
+global newestVersion
 
 --------------------------------------------------------------------------------
 ---------- Handles
@@ -51,7 +53,8 @@ end getGithubAddress
 
 --------------------------------------------------------------------------------
 on checkForUpdates()
-  set currentVersion to do shell script ("osascript -e 'version of app \"" & appName & "\"'")
+  set currentVersion to do shell script ("osascript -e 'version of app \"" & appPath & "\"'")
+  set newestVersion to "test"
 end checkForUpdates
 
 --------------------------------------------------------------------------------
@@ -61,7 +64,6 @@ getAppInfo()
 getGithubAddress()
 -- TODO check for wifi
 checkForUpdates()
-
 -- TODO prompt user for update
 -- TODO rename current app
 -- TODO clone updated app
