@@ -37,7 +37,7 @@ on getAppInfo() -- gets the name of the .app file by repeat checking containers 
 end getAppName
 
 --------------------------------------------------------------------------------
-on getGithubAddress()
+on getGithubAddress() -- gets the web address to the github page of the current app
   try
     --set gitShell to paragraph 2 of (do shell script "cd /Users/elimadsen/github/ ;git remote -v") -- used for testing
     set gitShell to paragraph 2 of (do shell script "cd " & POSIX path of appPath & ";git remote -v")
@@ -50,12 +50,18 @@ on getGithubAddress()
 end getGithubAddress
 
 --------------------------------------------------------------------------------
+on checkForUpdates()
+  set currentVersion to do shell script ("osascript -e 'version of app \"" & appName & "\"'")
+end checkForUpdates
+
+--------------------------------------------------------------------------------
 ---------- Script
 --------------------------------------------------------------------------------
 getAppInfo()
 getGithubAddress()
+-- TODO check for wifi
+checkForUpdates()
 
--- TODO check for updates
 -- TODO prompt user for update
 -- TODO rename current app
 -- TODO clone updated app
