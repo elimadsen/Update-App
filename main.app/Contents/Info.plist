@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>update</string>
+	<string>main</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
@@ -26,6 +26,6 @@
 	<key>LSRequiresCarbon</key>
 	<true/>
 	<key>CFBundleShortVersionString</key>
-	<string>0.01</string>
+	<string>1.0</string>
 </dict>
 </plist>

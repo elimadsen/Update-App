@@ -66,21 +66,11 @@ on checkForUpdates() -- gets version number from plist file on github and compar
 	set currentVersion to do shell script ("osascript -e 'version of app \"" & appPath & "\"'") -- TODO try to get current verstion and display error if can't
 	set plistAddress to "https://raw.githubusercontent.com" & (text (length of "https://github.com/") through (length of gitRemote) of gitRemote) & "/master/" & appName & "/Contents/Info.plist"
 
-	try
-		do shell script "cd " & tmpFiles & "; curl -O " & plistAddress
-	on error
-		display dialog "Error checking for for updates:
+	do shell script "cd " & tmpFiles & "; curl -O " & plistAddress
 
-		Unable to download Info.plst from " & plistAddress with title appName buttons ("Okay") default button "Okay"
-	end try
+	set newestVersion to do shell script ("defaults read " & tmpFiles & "Info.plist CFBundleShortVersionString")
 
-	try
-		set newestVersion to do shell script ("defaults read " & tmpFiles & "/Info.plist CFBundleShortVersionString")
-	on error
-		-- TODO error handling
-	end try
-
-	delay 1
+	delay 30
 
 	tell application "System Events"
 		if file (tmpFiles & "/Info.plist") exists then
@@ -116,6 +106,7 @@ end promptForUpdates
 --------------------------------------------------------------------------------
 getAppInfo()
 set appCheck to result
+log appCheck
 if appCheck is not "Skip" then
 	checkForUpdates()
 	set updateCheck to result
