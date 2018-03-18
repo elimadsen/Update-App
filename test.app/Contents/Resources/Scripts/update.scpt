@@ -4,8 +4,12 @@
 global appName
 global appPath
 global folderPath
+global gitRemote
 global currentVersion
 global newestVersion
+global tmpFiles
+
+set tmpFiles to POSIX path of ((path to temporary items) as text)
 
 --------------------------------------------------------------------------------
 ---------- Handles
@@ -39,33 +43,69 @@ on getAppInfo() -- gets the name of the .app file by repeat checking containers 
 end getAppName
 
 --------------------------------------------------------------------------------
-on getGithubAddress() -- gets the web address to the github page of the current app
+on checkForUpdates() -- gets version number from plist file on github and compares with local version number
   try
-    --set gitShell to paragraph 2 of (do shell script "cd /Users/elimadsen/github/ ;git remote -v") -- used for testing
-    set gitShell to paragraph 2 of (do shell script "cd " & POSIX path of appPath & ";git remote -v")
-    set gitRemote to (text 8 through (length of (gitShell as string) -7) of gitShell)
+    set gitRemote to (do shell script "cd " & POSIX path of appPath & ";git config --get remote.origin.url")
   on error
-    set gitShell to result
     set gitRemote to result
     display dialog result & ":\n Unable to run command \"git remote -v\" in " & POSIX path of folderPath &"\n\nEnsure that the folder containing " & appName & " is linked with github." with title appName buttons ("Okay") default button "Okay"
   end try
-end getGithubAddress
+
+  set currentVersion to do shell script ("osascript -e 'version of app \"" & appPath & "\"'")
+  set plistAddress to "https://raw.githubusercontent.com" & (text (length of "https://github.com/") through (length of gitRemote) of gitRemote) & "/master/" & appName & "/Contents/Info.plist"
+
+  try
+    do shell script "cd " & tmpFiles & "; curl -O " & plistAddress
+  on error
+    display dialog "Error checking for for updates:\n\nUnable to download Info.plst from " & plistAddress with title appName buttons ("Okay") default button "Okay"
+  end try
+
+  try
+    set newestVersion to do shell script ("defaults read " & tmpFiles & "/Info.plist CFBundleShortVersionString")
+  on error
+    -- TODO error handling
+  end try
+
+  tell application "System Events"
+    if file (tmpFiles & "/Info.plist") exists then
+      do shell script "rm " & tmpFiles & "/Info.plist"
+    end if
+  end tell
+
+  try
+    if currentVersion is not equal to newestVersion then
+      return "Updates Available"
+    else if currentVersion is equal to newestVersion then
+      return "No Updates Available"
+    end if
+  on error
+    return "Error Checking for Updates"
+  end try
+end checkForUpdates
 
 --------------------------------------------------------------------------------
-on checkForUpdates()
-  set currentVersion to do shell script ("osascript -e 'version of app \"" & appPath & "\"'")
-  set newestVersion to "test"
-end checkForUpdates
+on promptForUpdates(updateCheck)
+  if updateCheck is equal to "Updates Available" then
+    display dialog "Updates available!\n\ncurrent version is " & currentVersion & "\nnewest version is " & newestVersion with title appName buttons ("Remind me later","Update") default button "Update"
+    set buttonPressed to button returned of result
+    log buttonPressed
+  else if updateCheck is equal to "No Updates Available" then
+
+  else if updateCheck is equal to "Error Checking for Updates" then
+
+  end if
+end promptForUpdates
 
 --------------------------------------------------------------------------------
 ---------- Script
 --------------------------------------------------------------------------------
 getAppInfo()
-getGithubAddress()
+
 -- TODO check for wifi
+
 checkForUpdates()
+set updateCheck to result
+promptForUpdates(updateCheck)
+
 -- TODO prompt user for update
--- TODO rename current app
--- TODO clone updated app
--- TODO start updated app and quit existing one
--- TODO delete old app at beginning of new app
+-- TODO tell system events to tell terminal to activate and run git fetch;sleep 5;git pull and then quit
