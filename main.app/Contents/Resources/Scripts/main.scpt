@@ -49,7 +49,7 @@ on getAppInfo() -- gets the name of the .app file by repeat checking containers 
 end getAppInfo
 
 --------------------------------------------------------------------------------
-on checkForUpdates() -- gets version number from plist file on github and compares with local version number
+on checkForUpdates() -- gets version number from plist file on github, saves it to temp files, reads version number and compares it with version number from same plist file on local app
 	set forward to yes
 
 	try
@@ -127,7 +127,7 @@ downloaded file from: " & plistAddress with title appName buttons ("Okay") defau
 end checkForUpdates
 
 --------------------------------------------------------------------------------
-on promptForUpdates(updateCheck)
+on promptForUpdates(updateCheck) -- prompts the user to update or skip update
 	display dialog "Updates available!
 
 	current version: " & currentVersion & "
