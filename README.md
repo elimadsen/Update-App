@@ -1,6 +1,6 @@
 # Update-App
 
-An app that updates itself. Written with applescript.
+written in applescript.
 
 The main goal of this applescript application was to give myself applescript experience but if has proven useful in a few situations.
 
